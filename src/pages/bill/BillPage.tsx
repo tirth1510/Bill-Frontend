@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -39,7 +39,7 @@ const initialBills = [
 ];
 
 export default function BillPage() {
-  const [bills, setBills] = useState(initialBills);
+  const [bills] = useState(initialBills);
   const [open, setOpen] = useState(false);
   const [cart, setCart] = useState<any[]>([]);
   const [barcode, setBarcode] = useState("");
@@ -200,7 +200,7 @@ export default function BillPage() {
               <TabsContent value="scanner" className="mt-4">
                 <div className="border rounded-md  flex items-center justify-center text-gray-500">
                   <ScannerTab
-                    onDetected={function (code: string): void {
+                    onDetected={function (_code: string): void {
                       throw new Error("Function not implemented.");
                     }}
                   />

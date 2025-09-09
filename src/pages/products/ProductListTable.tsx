@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -70,7 +70,7 @@ export default function ProductTable() {
   // Filters & search
   const [stockFilter, setStockFilter] = useState<"low" | "high" | "none">("none");
   const [itemSearch, setItemSearch] = useState("");
-  const [typeSearch, setTypeSearch] = useState("");
+  const [typeSearch] = useState("");
 
   // Fetch products
   const fetchProducts = async () => {
