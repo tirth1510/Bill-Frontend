@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mall Customer Bill</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .bill-container {
+      max-width: 500px;
+      margin: 20px auto;
+      border: 2px solid #333;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Background shop icon styling */
+    .bill-container::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      background-image: url('https://cdn-icons-png.flaticon.com/512/34/34568.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.05;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .header {
+      text-align: center;
+      border-bottom: 1px dashed #333;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .bill-details {
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+    }
+    .table th, .table td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px 15px; /* left and right padding */
+      text-align: left;
+    }
+    .table th {
+      background-color: #f4f4f4;
+      font-weight: bold;
+    }
+    .totals {
+      text-align: right;
+      margin-top: 10px;
+      font-weight: bold;
+      position: relative;
+      z-index: 1;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      border-top: 1px dashed #333;
+      padding-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    @media print {
+      body {
+        background-color: white !important;
+      }
+      .bill-container {
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .bill-container::before {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bill-container">
+    <div class="header">
+      <h1 class="text-2xl font-bold text-gray-800">MALL NAME</h1>
+      <p class="text-sm text-gray-600">Address Line 1</p>
+      <p class="text-sm text-gray-600">Address Line 2</p>
+      <p class="text-sm text-gray-600">Phone: 123-456-7890</p>
+      <p class="text-sm text-gray-600">Email: info@mallname.com</p>
+    </div>
+
+    <div class="bill-details">
+      <h2 class="text-lg font-semibold mb-2">Customer Bill</h2>
+      <p><strong>Date:</strong> 2024-06-10</p>
+      <p><strong>Bill No:</strong> 000123</p>
+      <p><strong>Customer Name:</strong> John Doe</p>
+      <p><strong>Customer ID:</strong> CUST001</p>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Item Description</th>
+          <th>Qty</th>
+          <th>Gram</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>T-Shirt</td>
+          <td>2</td>
+          <td>—</td>
+          <td>₹15.00</td>
+          <td>₹30.00</td>
+        </tr>
+        <tr>
+          <td>Jeans</td>
+          <td>1</td>
+          <td>—</td>
+          <td>₹40.00</td>
+          <td>₹40.00</td>
+        </tr>
+        <tr>
+          <td>Sneakers</td>
+          <td>1</td>
+          <td>—</td>
+          <td>₹60.00</td>
+          <td>₹60.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <p>Subtotal: ₹130.00</p>
+      <p class="text-lg border-t border-gray-400 pt-2">Total Amount: ₹130.00</p>
+    </div>
+
+    <div class="footer">
+      <p class="text-gray-700 font-medium">Thank you for shopping with us!</p>
+      <p class="text-gray-600">Visit again!</p>
+    </div>
+  </div>
+</body>
+</html>
