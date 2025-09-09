@@ -1,40 +1,12 @@
 import React, { useEffect } from "react";
 import GoogleLoginButton from "./google";
 
-import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 
-interface JwtPayload {
-  id: string;
-  exp: number;
-}
+
+
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const accessToken = Cookies.get("accessToken");
-
-    if (!accessToken) return; // no token → stay on login
-
-    try {
-      const decoded = jwtDecode<JwtPayload>(accessToken);
-      const currentTime = Date.now() / 1000;
-
-      if (decoded.exp > currentTime) {
-        // token valid → redirect to dashboard
-        navigate("/dashboard", { replace: true });
-      } else {
-        // token expired → remove cookie
-        Cookies.remove("accessToken");
-      }
-    } catch (err) {
-      console.error("Invalid token", err);
-      Cookies.remove("accessToken");
-    }
-  }, [navigate]);
-
+  
   useEffect(() => {
     const particlesContainer = document.getElementById("particles");
     if (particlesContainer) {

@@ -22,7 +22,7 @@ const GoogleLoginButton: React.FC = () => {
       console.log("Login success:", res.data);
 
       
-        navigate("/pin");
+        navigate("/dashboard");
     
     } catch (err) {
       console.error("Login failed:", err);
