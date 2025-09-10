@@ -76,7 +76,7 @@ export default function ProductTable() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:5000/products", {
+      const res = await axios.get(`${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/`, {
         withCredentials: true,
       });
       setProducts(res.data.data);
@@ -142,7 +142,7 @@ export default function ProductTable() {
     if (!editProduct || editPrice === null) return;
     try {
       await axios.put(
-        `http://localhost:5000/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
+        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
         { price: editPrice },
         { withCredentials: true }
       );
@@ -161,7 +161,7 @@ export default function ProductTable() {
     if (!editProduct || editStock === null) return;
     try {
       await axios.put(
-        `http://localhost:5000/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
+        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
         { Stock: editStock },
         { withCredentials: true }
       );
@@ -180,7 +180,7 @@ export default function ProductTable() {
     if (!editProduct || editItemName === null) return;
     try {
       await axios.put(
-        `http://localhost:5000/products/update-variant-itemname/${editProduct.id}/${editProduct._id}`,
+        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-itemname/${editProduct.id}/${editProduct._id}`,
         { ItemName: editItemName },
         { withCredentials: true }
       );
@@ -204,7 +204,7 @@ export default function ProductTable() {
 
     try {
       await axios.post(
-        `http://localhost:5000/products/${selectedProduct.id}/variants`,
+        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/${selectedProduct.id}/variants`,
         {
           gram: newVariant.Gram,
           price: newVariant.Price,

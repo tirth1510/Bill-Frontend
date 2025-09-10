@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<{ user: User }>("http://localhost:5000/auth/user", { withCredentials: true });
+      const res = await axios.get<{ user: User }>(`${import.meta.env.VITE_FRONTEND_LIVE_URL}/auth/user`, { withCredentials: true });
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post("http://localhost:5000/auth/logout", {}, { withCredentials: true });
+      await axios.post(`${import.meta.env.VITE_FRONTEND_LIVE_URL}/auth/logout`, {}, { withCredentials: true });
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);

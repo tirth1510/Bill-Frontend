@@ -2,6 +2,12 @@ import React from "react";
 import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+const backendGoogleLoginUrl = import.meta.env.VITE_FRONTEND_LIVE_URL
+
+console.log("Google Login URL:", backendGoogleLoginUrl);
+
+
+
 
 const GoogleLoginButton: React.FC = () => {
   const navigate = useNavigate(); // <-- useNavigate instead of useRouter
@@ -14,7 +20,7 @@ const GoogleLoginButton: React.FC = () => {
       }
 
       const res = await axios.post(
-        "http://localhost:5000/auth/google-login",
+       `${import.meta.env.VITE_FRONTEND_LIVE_URL}/auth/google-login`,
         { token: credentialResponse.credential },
         { withCredentials: true }
       );
