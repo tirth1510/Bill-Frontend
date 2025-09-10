@@ -19,7 +19,7 @@ export default function BillPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const [billNo, setBillNo] = useState<string | null>(null);
+  const [billNo] = useState<string | null>(null);
 
   // Fetch product from backend
   const fetchProduct = async (code: string, type: "barcode" | "barCodenumber") => {
