@@ -25,7 +25,7 @@ export default function BillPage() {
   const fetchProduct = async (code: string, type: "barcode" | "barCodenumber") => {
     try {
       const res = await fetch(
-        `${process.env.VITE_FRONTEND_LIVE_URL}/products/bar-code?${type}=${code}`,
+        `https://bill-backend-j5en.onrender.com/products/bar-code?${type}=${code}`,
         { credentials: "include" }
       );
       const data = await res.json();
