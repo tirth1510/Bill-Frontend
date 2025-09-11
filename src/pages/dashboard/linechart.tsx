@@ -26,7 +26,7 @@ export default function SalesChart() {
     const fetchStats = async () => {
       try {
         const res = await fetch(
-          `${process.env.VITE_FRONTEND_LIVE_URL}/bill/stats/payment-method?period=${period}`,
+          `https://bill-backend-j5en.onrender.com/bill/stats/payment-method?period=${period}`,
           { credentials: "include" }
         );
         const data = await res.json();

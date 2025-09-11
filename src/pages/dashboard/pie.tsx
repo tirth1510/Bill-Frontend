@@ -24,7 +24,7 @@ export default function ItemsReport() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        let url = `${process.env.VITE_FRONTEND_LIVE_URL}/bill/stats/items-report?period=${period}`;
+        let url = `https://bill-backend-j5en.onrender.com/bill/stats/items-report?period=${period}`;
         if (period === "custom" && from && to) {
           url += `&from=${from}&to=${to}`;
         }

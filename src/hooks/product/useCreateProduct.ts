@@ -26,7 +26,7 @@ export function useCreateProduct() {
       setSuccess(false);
 
       const response = await axios.post(
-        "http://localhost:5000/products/create",
+        "https://bill-backend-j5en.onrender.com/products/create",
         productData,
         { withCredentials: true }
       );

@@ -84,7 +84,7 @@ export default function ProductTable() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.VITE_FRONTEND_LIVE_URL}/products/`,
+        `https://bill-backend-j5en.onrender.com/products/`,
         {
           withCredentials: true,
         }
@@ -152,9 +152,7 @@ export default function ProductTable() {
     if (!editProduct || editPrice === null) return;
     try {
       await axios.put(
-        `${
-         process.env.VITE_FRONTEND_LIVE_URL
-        }/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
+        `https://bill-backend-j5en.onrender.com/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
         { price: editPrice },
         { withCredentials: true }
       );
@@ -175,9 +173,7 @@ export default function ProductTable() {
     if (!editProduct || editStock === null) return;
     try {
       await axios.put(
-        `${
-          process.env.VITE_FRONTEND_LIVE_URL
-        }/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
+        `https://bill-backend-j5en.onrender.com/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
         { Stock: editStock },
         { withCredentials: true }
       );
@@ -198,9 +194,7 @@ export default function ProductTable() {
     if (!editProduct || editItemName === null) return;
     try {
       await axios.put(
-        `${
-          process.env.VITE_FRONTEND_LIVE_URL
-        }/products/update-variant-itemname/${editProduct.id}/${
+        `https://bill-backend-j5en.onrender.com/products/update-variant-itemname/${editProduct.id}/${
           editProduct._id
         }`,
         { ItemName: editItemName },
@@ -228,7 +222,7 @@ export default function ProductTable() {
 
     try {
       await axios.post(
-        `${process.env.VITE_FRONTEND_LIVE_URL}/products/${
+        `https://bill-backend-j5en.onrender.com/products/${
           selectedProduct.id
         }/variants`,
         {

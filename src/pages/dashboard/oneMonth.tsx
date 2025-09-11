@@ -31,9 +31,7 @@ export default function TopSellingItems() {
     const fetchTopItems = async () => {
       try {
         const res = await fetch(
-          `${
-            process.env.VITE_FRONTEND_LIVE_URL
-          }/bill/stats/top-items?period=${period}`,
+          `https://bill-backend-j5en.onrender.com/bill/stats/top-items?period=${period}`,
           { credentials: "include" }
         );
         const data = await res.json();

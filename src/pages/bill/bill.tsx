@@ -101,7 +101,7 @@ export default function BillPage() {
         }))
       };
 
-      const res = await fetch(`${process.env.VITE_FRONTEND_LIVE_URL}/bill/create-bill`, {
+      const res = await fetch(`https://bill-backend-j5en.onrender.com/bill/create-bill`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

@@ -13,7 +13,7 @@ export default function SalesTrendChart() {
     const fetchStats = async () => {
       try {
         const res = await fetch(
-          `${process.env.VITE_FRONTEND_LIVE_URL}/bill/stats/sales-trend?range=${range}`,
+          `https://bill-backend-j5en.onrender.com/bill/stats/sales-trend?range=${range}`,
           { credentials: "include" }
         );
         const data = await res.json();

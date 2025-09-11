@@ -1,5 +1,11 @@
 // context/AuthContext.tsx
-import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import axios from "axios";
 import type { User } from "@/types/auth";
 
@@ -8,6 +14,7 @@ interface AuthContextType {
   loading: boolean;
   fetchUser: () => Promise<void>;
   logout: () => Promise<void>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,7 +30,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await axios.get<{ user: User }>(`${process.env.VITE_FRONTEND_LIVE_URL}/auth/user`, { withCredentials: true });
+      const res = await axios.get<{ user: User }>(
+        `https://bill-backend-j5en.onrender.com/auth/user`,
+        { withCredentials: true }
+      );
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
@@ -34,7 +44,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post(`${process.env.VITE_FRONTEND_LIVE_URL}/auth/logout`, {}, { withCredentials: true });
+      await axios.post(
+        `https://bill-backend-j5en.onrender.com/auth/logout`,
+        {},
+        { withCredentials: true }
+      );
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);
@@ -46,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, fetchUser, logout }}>
+    <AuthContext.Provider value={{ user, loading, fetchUser, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
