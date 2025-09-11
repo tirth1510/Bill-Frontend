@@ -19,13 +19,13 @@ export default function BillPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [barcode, setBarcode] = useState("");
   const [showScanner, setShowScanner] = useState(false);
-  const [billNo] = useState<string | null>(null);
+
 
   // Fetch product from backend
   const fetchProduct = async (code: string, type: "barcode" | "barCodenumber") => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/bar-code?${type}=${code}`,
+        `${process.env.VITE_FRONTEND_LIVE_URL}/products/bar-code?${type}=${code}`,
         { credentials: "include" }
       );
       const data = await res.json();
@@ -93,7 +93,7 @@ export default function BillPage() {
     try {
       const payload = {
         customerName: "John Doe", // could be dynamic
-        paymentMethod: "Cash",
+        paymentMethod: "Card",
         items: cart.map(item => ({
           barcode: item.barcode,
           barcodenumber: item.barcode,
@@ -101,7 +101,7 @@ export default function BillPage() {
         }))
       };
 
-      const res = await fetch(`${import.meta.env.VITE_FRONTEND_LIVE_URL}/bill/create-bill`, {
+      const res = await fetch(`${process.env.VITE_FRONTEND_LIVE_URL}/bill/create-bill`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -188,14 +188,14 @@ export default function BillPage() {
               <div className="border-b border-dashed my-2"></div>
             </CardHeader>
             <CardContent>
-              {cart.length === 0 && !billNo ? (
+              {cart.length === 0 ? (
                 <p className="text-gray-500">Cart is empty</p>
               ) : (
                 <div className="space-y-4">
                   {/* Bill Details */}
                   <div className="text-sm">
                     <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
-                    <p><strong>Bill No:</strong> {billNo || "#000123"}</p>
+                  
                     <p><strong>Customer Name:</strong> John Doe</p>
                     <p><strong>Customer ID:</strong> CUST001</p>
                   </div>

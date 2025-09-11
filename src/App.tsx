@@ -53,7 +53,12 @@ function App() {
              <Bill />
            </ProtectedRoute>
           } />
-        <Route path="/invoice" element={<BillPage />} />
+        <Route path="/invoice" element={
+          <ProtectedRoute>
+
+            <BillPage />
+          </ProtectedRoute>
+          } />
       </Routes>
     </Router>
   );

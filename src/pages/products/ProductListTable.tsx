@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2, Printer } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import axios from "axios";
 import {
   Dialog,
@@ -25,6 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Barcode from "react-barcode";
 import { FaBasketShopping } from "react-icons/fa6";
+import ProductDetailsDialog from "./ProductDetailsDialog";
 
 type ProductVariant = {
   id: string; // Product ID
@@ -41,11 +42,15 @@ type ProductVariant = {
 
 export default function ProductTable() {
   const [products, setProducts] = useState<ProductVariant[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<ProductVariant[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductVariant[]>(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedProduct, setSelectedProduct] = useState<ProductVariant | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductVariant | null>(
+    null
+  );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [isEditPriceOpen, setIsEditPriceOpen] = useState(false);
@@ -68,7 +73,9 @@ export default function ProductTable() {
   });
 
   // Filters & search
-  const [stockFilter, setStockFilter] = useState<"low" | "high" | "none">("none");
+  const [stockFilter, setStockFilter] = useState<"low" | "high" | "none">(
+    "none"
+  );
   const [itemSearch, setItemSearch] = useState("");
   const [typeSearch] = useState("");
 
@@ -76,9 +83,12 @@ export default function ProductTable() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        `${process.env.VITE_FRONTEND_LIVE_URL}/products/`,
+        {
+          withCredentials: true,
+        }
+      );
       setProducts(res.data.data);
       setFilteredProducts(res.data.data);
     } catch (err: any) {
@@ -142,12 +152,16 @@ export default function ProductTable() {
     if (!editProduct || editPrice === null) return;
     try {
       await axios.put(
-        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
+        `${
+         process.env.VITE_FRONTEND_LIVE_URL
+        }/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
         { price: editPrice },
         { withCredentials: true }
       );
       setProducts((prev) =>
-        prev.map((p) => (p._id === editProduct._id ? { ...p, Price: editPrice } : p))
+        prev.map((p) =>
+          p._id === editProduct._id ? { ...p, Price: editPrice } : p
+        )
       );
       setIsEditPriceOpen(false);
       setEditProduct(null);
@@ -161,12 +175,16 @@ export default function ProductTable() {
     if (!editProduct || editStock === null) return;
     try {
       await axios.put(
-        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
+        `${
+          process.env.VITE_FRONTEND_LIVE_URL
+        }/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
         { Stock: editStock },
         { withCredentials: true }
       );
       setProducts((prev) =>
-        prev.map((p) => (p._id === editProduct._id ? { ...p, Stock: editStock } : p))
+        prev.map((p) =>
+          p._id === editProduct._id ? { ...p, Stock: editStock } : p
+        )
       );
       setIsEditStockOpen(false);
       setEditProduct(null);
@@ -180,12 +198,18 @@ export default function ProductTable() {
     if (!editProduct || editItemName === null) return;
     try {
       await axios.put(
-        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/update-variant-itemname/${editProduct.id}/${editProduct._id}`,
+        `${
+          process.env.VITE_FRONTEND_LIVE_URL
+        }/products/update-variant-itemname/${editProduct.id}/${
+          editProduct._id
+        }`,
         { ItemName: editItemName },
         { withCredentials: true }
       );
       setProducts((prev) =>
-        prev.map((p) => (p._id === editProduct._id ? { ...p, ItemName: editItemName } : p))
+        prev.map((p) =>
+          p._id === editProduct._id ? { ...p, ItemName: editItemName } : p
+        )
       );
       setIsEditItemNameOpen(false);
       setEditProduct(null);
@@ -204,7 +228,9 @@ export default function ProductTable() {
 
     try {
       await axios.post(
-        `${import.meta.env.VITE_FRONTEND_LIVE_URL}/products/${selectedProduct.id}/variants`,
+        `${process.env.VITE_FRONTEND_LIVE_URL}/products/${
+          selectedProduct.id
+        }/variants`,
         {
           gram: newVariant.Gram,
           price: newVariant.Price,
@@ -231,7 +257,9 @@ export default function ProductTable() {
           <div className="relative w-full md:w-48">
             <select
               value={stockFilter}
-              onChange={(e) => setStockFilter(e.target.value as "low" | "high" | "none")}
+              onChange={(e) =>
+                setStockFilter(e.target.value as "low" | "high" | "none")
+              }
               className="w-full appearance-none border border-gray-300 rounded-lg pr-10 pl-3 py-2 shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
             >
               <option value="none">None</option>
@@ -263,19 +291,27 @@ export default function ProductTable() {
 
       {/* Table */}
       <Table className="min-w-full border border-gray-200 rounded-lg overflow-hidden text-center">
-        <TableCaption className="text-gray-500 py-2">All Product Variants</TableCaption>
+        <TableCaption className="text-gray-500 py-2">
+          All Product Variants
+        </TableCaption>
         <TableHeader className="bg-gray-100">
           <TableRow>
-            {["Product Name", "Gram", "Price", "Stock", "Barcode", "Barcode Number", "Action"].map(
-              (title) => (
-                <TableHead
-                  key={title}
-                  className="border px-4 py-2 text-gray-700 font-semibold text-sm md:text-lg"
-                >
-                  {title}
-                </TableHead>
-              )
-            )}
+            {[
+              "Product Name",
+              "Gram",
+              "Price",
+              "Stock",
+              "Barcode",
+              "Barcode Number",
+              "Action",
+            ].map((title) => (
+              <TableHead
+                key={title}
+                className="border px-4 py-2 text-gray-700 font-semibold text-sm md:text-lg"
+              >
+                {title}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
 
@@ -303,7 +339,9 @@ export default function ProductTable() {
                     />
                   </div>
                 </TableCell>
-                <TableCell className="border px-4 py-3 text-center">{p.Gram} g</TableCell>
+                <TableCell className="border px-4 py-3 text-center">
+                  {p.Gram} g
+                </TableCell>
                 <TableCell className="border px-4 py-3 text-center text-green-600 font-semibold">
                   <div className="flex items-center justify-center gap-2">
                     ₹ {p.Price}/-
@@ -324,10 +362,18 @@ export default function ProductTable() {
                 </TableCell>
                 <TableCell className="border px-4 py-3 text-center">
                   <div className="flex justify-center">
-                    <Barcode value={p.BarCode} format="CODE128" width={1} height={40} displayValue />
+                    <Barcode
+                      value={p.BarCode}
+                      format="CODE128"
+                      width={1}
+                      height={40}
+                      displayValue
+                    />
                   </div>
                 </TableCell>
-                <TableCell className="border px-4 py-3 text-center">{p.BarCodenumber}</TableCell>
+                <TableCell className="border px-4 py-3 text-center">
+                  {p.BarCodenumber}
+                </TableCell>
 
                 {/* Action cell with Add Variant */}
                 <TableCell className="border px-4 py-3 text-center">
@@ -363,58 +409,20 @@ export default function ProductTable() {
           )}
         </TableBody>
       </Table>
-{selectedProduct && (
-        <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
-          <DialogContent className="max-w-2xl rounded-2xl shadow-xl bg-white p-6">
-            <DialogHeader>
-              <DialogTitle>Product Details</DialogTitle>
-            </DialogHeader>
-            <div className="flex justify-center mb-4">
-              <img
-                src={selectedProduct.image || "/shop.png"}
-                alt={selectedProduct.ItemName}
-                className="rounded-lg border max-h-64 object-contain"
-              />
-            </div>
-            <h3 className="text-2xl font-bold text-center mb-1">
-              {selectedProduct.ItemName}
-            </h3>
-            <div className="grid grid-cols-2 gap-6 text-center">
-              <div className="space-y-3">
-                <Label>Gram: {selectedProduct.Gram}</Label>
-                <Label>Stock: {selectedProduct.Stock}</Label>
-                <Label>Price: ₹ {selectedProduct.Price}</Label>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <Barcode
-                  value={selectedProduct.BarCode}
-                  format="CODE128"
-                  width={1}
-                  height={40}
-                  displayValue={true}
-                />
-                <Label>Barcode Number: {selectedProduct.BarCodenumber}</Label>
-              </div>
-            </div>
-            <div className="flex justify-between mt-6">
-              <Button className="flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700">
-                <Printer className="w-4 h-4" /> Add to Label Cart
-              </Button>
-              <Button className="flex items-center gap-2 bg-green-600 text-white hover:bg-green-700">
-                <Printer className="w-4 h-4" /> Print Labels
-              </Button>
-              <Button onClick={closeDialog} variant="outline">
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+      {selectedProduct && (
+        <ProductDetailsDialog
+          product={selectedProduct}
+          open={isDialogOpen}
+          onClose={closeDialog}
+        />
       )}
       {/* Add Variant Dialog */}
       <Dialog open={isAddVariantOpen} onOpenChange={setIsAddVariantOpen}>
         <DialogContent className="max-w-md rounded-2xl shadow-xl bg-white p-6">
           <DialogHeader>
-            <DialogTitle>Add Variant for {selectedProduct?.ItemName}</DialogTitle>
+            <DialogTitle>
+              Add Variant for {selectedProduct?.ItemName}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -426,7 +434,10 @@ export default function ProductTable() {
                   type="number"
                   value={(newVariant as any)[field] || ""}
                   onChange={(e) =>
-                    setNewVariant({ ...newVariant, [field]: Number(e.target.value) })
+                    setNewVariant({
+                      ...newVariant,
+                      [field]: Number(e.target.value),
+                    })
                   }
                 />
               </div>
@@ -434,10 +445,16 @@ export default function ProductTable() {
           </div>
 
           <DialogFooter className="flex justify-end gap-2 mt-6">
-            <Button variant="outline" onClick={() => setIsAddVariantOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddVariantOpen(false)}
+            >
               Cancel
             </Button>
-            <Button className="bg-green-600 text-white hover:bg-green-700" onClick={handleAddVariant}>
+            <Button
+              className="bg-green-600 text-white hover:bg-green-700"
+              onClick={handleAddVariant}
+            >
               Save
             </Button>
           </DialogFooter>
@@ -445,9 +462,31 @@ export default function ProductTable() {
       </Dialog>
 
       {/* Reusable Edit Dialogs */}
-      <EditDialog title="Edit Price" value={editPrice} setValue={setEditPrice} open={isEditPriceOpen} setOpen={setIsEditPriceOpen} onSave={handleSavePrice} />
-      <EditDialog title="Edit Stock" value={editStock} setValue={setEditStock} open={isEditStockOpen} setOpen={setIsEditStockOpen} onSave={handleSaveStock} />
-      <EditDialog title="Edit Item Name" value={editItemName} setValue={setEditItemName} open={isEditItemNameOpen} setOpen={setIsEditItemNameOpen} onSave={handleSaveItemName} isString />
+      <EditDialog
+        title="Edit Price"
+        value={editPrice}
+        setValue={setEditPrice}
+        open={isEditPriceOpen}
+        setOpen={setIsEditPriceOpen}
+        onSave={handleSavePrice}
+      />
+      <EditDialog
+        title="Edit Stock"
+        value={editStock}
+        setValue={setEditStock}
+        open={isEditStockOpen}
+        setOpen={setIsEditStockOpen}
+        onSave={handleSaveStock}
+      />
+      <EditDialog
+        title="Edit Item Name"
+        value={editItemName}
+        setValue={setEditItemName}
+        open={isEditItemNameOpen}
+        setOpen={setIsEditItemNameOpen}
+        onSave={handleSaveItemName}
+        isString
+      />
     </div>
   );
 }
@@ -463,7 +502,15 @@ type EditDialogProps = {
   isString?: boolean;
 };
 
-function EditDialog({ title, value, setValue, open, setOpen, onSave, isString }: EditDialogProps) {
+function EditDialog({
+  title,
+  value,
+  setValue,
+  open,
+  setOpen,
+  onSave,
+  isString,
+}: EditDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-md rounded-2xl shadow-xl bg-white p-6">
@@ -476,14 +523,21 @@ function EditDialog({ title, value, setValue, open, setOpen, onSave, isString }:
             id="editInput"
             type={isString ? "text" : "number"}
             value={value ?? ""}
-            onChange={(e) => (isString ? setValue(e.target.value) : setValue(Number(e.target.value)))}
+            onChange={(e) =>
+              isString
+                ? setValue(e.target.value)
+                : setValue(Number(e.target.value))
+            }
           />
         </div>
         <DialogFooter className="flex justify-end gap-2 mt-6">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={onSave} className="bg-green-600 text-white hover:bg-green-700">
+          <Button
+            onClick={onSave}
+            className="bg-green-600 text-white hover:bg-green-700"
+          >
             Save
           </Button>
         </DialogFooter>
