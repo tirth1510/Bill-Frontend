@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import {
   Table,
@@ -12,7 +10,15 @@ import {
 } from "@/components/ui/table";
 import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import {
+  ArrowDownCircle,
+  ArrowRightCircle,
+  ArrowUpCircle,
+  Eye,
+  Package,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import axios from "axios";
 import {
   Dialog,
@@ -26,7 +32,15 @@ import { Input } from "@/components/ui/input";
 import Barcode from "react-barcode";
 import { FaBasketShopping } from "react-icons/fa6";
 import ProductDetailsDialog from "./ProductDetailsDialog";
-
+import Loader from "@/layouts/Loading";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 type ProductVariant = {
   id: string; // Product ID
   _id: string; // Variant ID
@@ -76,8 +90,9 @@ export default function ProductTable() {
   const [stockFilter, setStockFilter] = useState<"low" | "high" | "none">(
     "none"
   );
-  const [itemSearch, setItemSearch] = useState("");
-  const [typeSearch] = useState("");
+  const [itemSearch, setItemSearch] = useState(""); // live typed text
+  const [appliedItemSearch, setAppliedItemSearch] = useState(""); // applied on search
+  const [typeSearch, setTypeSearch] = useState("");
 
   // Fetch products
   const fetchProducts = async () => {
@@ -102,24 +117,36 @@ export default function ProductTable() {
     fetchProducts();
   }, []);
 
-  // Filter & search
-  useEffect(() => {
-    let temp = [...products];
+/// Filter & search
+useEffect(() => {
+  let temp = [...products];
 
-    if (stockFilter === "low") temp.sort((a, b) => a.Stock - b.Stock);
-    if (stockFilter === "high") temp.sort((a, b) => b.Stock - a.Stock);
+  // Stock filter
+  if (stockFilter === "low") temp.sort((a, b) => a.Stock - b.Stock);
+  if (stockFilter === "high") temp.sort((a, b) => b.Stock - a.Stock);
 
-    if (itemSearch.trim() !== "")
-      temp = temp.filter((p) =>
-        p.ItemName.toLowerCase().includes(itemSearch.toLowerCase())
-      );
-    if (typeSearch.trim() !== "")
-      temp = temp.filter((p) =>
-        p.Type?.toLowerCase().includes(typeSearch.toLowerCase())
-      );
+  // Exact match applied only after Enter / click
+  if (appliedItemSearch.trim() !== "") {
+    temp = temp.filter(
+      (p) => p.ItemName.toLowerCase() === appliedItemSearch.toLowerCase()
+    );
+  } else if (itemSearch.trim() !== "") {
+    // Live filtering (partial match while typing)
+    temp = temp.filter((p) =>
+      p.ItemName.toLowerCase().includes(itemSearch.toLowerCase())
+    );
+  }
 
-    setFilteredProducts(temp);
-  }, [products, stockFilter, itemSearch, typeSearch]);
+  // Type filter
+  if (typeSearch.trim() !== "") {
+    temp = temp.filter(
+      (p) => p.Type?.toLowerCase() === typeSearch.toLowerCase()
+    );
+  }
+
+  setFilteredProducts(temp);
+}, [products, stockFilter, itemSearch, appliedItemSearch, typeSearch]);
+
 
   // Dialog handlers
   const openDialog = (product: ProductVariant) => {
@@ -150,22 +177,31 @@ export default function ProductTable() {
 
   const handleSavePrice = async () => {
     if (!editProduct || editPrice === null) return;
+
     try {
       await axios.put(
         `https://bill-backend-j5en.onrender.com/products/update-variant-price/${editProduct.id}/${editProduct._id}`,
         { price: editPrice },
         { withCredentials: true }
       );
+
       setProducts((prev) =>
         prev.map((p) =>
           p._id === editProduct._id ? { ...p, Price: editPrice } : p
         )
       );
+
       setIsEditPriceOpen(false);
       setEditProduct(null);
       setEditPrice(null);
+
+      toast.success(
+        `Price for ${editProduct.ItemName} has been updated to ₹${editPrice}`
+      );
     } catch (err) {
       console.error(err);
+
+      toast.error("Something went wrong while updating the price.");
     }
   };
 
@@ -185,8 +221,12 @@ export default function ProductTable() {
       setIsEditStockOpen(false);
       setEditProduct(null);
       setEditStock(null);
+      toast.success(
+        `Stock for ${editProduct.ItemName} has been updated to ${editStock}`
+      );
     } catch (err) {
       console.error(err);
+      toast.error("Something went wrong while updating the Stock .");
     }
   };
 
@@ -194,9 +234,7 @@ export default function ProductTable() {
     if (!editProduct || editItemName === null) return;
     try {
       await axios.put(
-        `https://bill-backend-j5en.onrender.com/products/update-variant-itemname/${editProduct.id}/${
-          editProduct._id
-        }`,
+        `https://bill-backend-j5en.onrender.com/products/update-variant-itemname/${editProduct.id}/${editProduct._id}`,
         { ItemName: editItemName },
         { withCredentials: true }
       );
@@ -222,9 +260,7 @@ export default function ProductTable() {
 
     try {
       await axios.post(
-        `https://bill-backend-j5en.onrender.com/products/${
-          selectedProduct.id
-        }/variants`,
+        `https://bill-backend-j5en.onrender.com/products/${selectedProduct.id}/variants`,
         {
           gram: newVariant.Gram,
           price: newVariant.Price,
@@ -241,46 +277,96 @@ export default function ProductTable() {
     }
   };
 
+  const handleSearch = () => {
+    setAppliedItemSearch(itemSearch.trim());
+  };
+
   return (
     <div className="p-6 min-h-screen">
-      <h2 className="text-xl font-semibold mb-4 text-center">Products</h2>
-
       {/* Filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm mb-10">
-        <div className="flex flex-col md:flex-row gap-4 items-center w-full">
-          <div className="relative w-full md:w-48">
-            <select
-              value={stockFilter}
-              onChange={(e) =>
-                setStockFilter(e.target.value as "low" | "high" | "none")
-              }
-              className="w-full appearance-none border border-gray-300 rounded-lg pr-10 pl-3 py-2 shadow-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
-            >
-              <option value="none">None</option>
-              <option value="low">Low Stock</option>
-              <option value="high">High Stock</option>
-            </select>
-            <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-              <FiChevronDown className="w-5 h-5 text-gray-500" />
-            </div>
-          </div>
-
-          <div className="relative w-full md:w-64">
+        <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4 mb-4">
+          {/* 🔍 Search Bar (Left Side) */}
+          <div className="relative w-full md:w-1/3">
             <input
               type="text"
               placeholder="Type item name..."
               value={itemSearch}
               onChange={(e) => setItemSearch(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-400"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
+              className="w-full border border-gray-300 rounded-lg pl-10 pr-10 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
             />
+
+            {/* Left search icon */}
             <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
               <FiSearch className="w-5 h-5 text-gray-400" />
             </div>
+
+            {/* Right button */}
+            {appliedItemSearch ? (
+              // Clear button after search applied
+              <button
+                type="button"
+                onClick={() => {
+                  setItemSearch("");
+                  setAppliedItemSearch("");
+                }}
+                aria-label="Clear"
+                className="absolute inset-y-0 right-2 flex items-center justify-center text-red-500 hover:text-red-700 z-10 pointer-events-auto"
+              >
+                ✕
+              </button>
+            ) : (
+              // Search button before search applied
+              <button
+                type="button"
+                onClick={handleSearch}
+                aria-label="Search"
+                className="absolute inset-y-0 right-2 flex items-center justify-center text-blue-500 hover:text-blue-700 z-10 pointer-events-auto"
+              >
+                <ArrowRightCircle className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <Select
+              value={stockFilter}
+              onValueChange={(value: "low" | "high" | "none") =>
+                setStockFilter(value)
+              }
+            >
+              <SelectTrigger className="w-full md:w-48 text-center ">
+                <SelectValue placeholder="Select Stock" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-gray-500" />
+                    <span>None</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="low">
+                  <div className="flex items-center gap-2">
+                    <ArrowDownCircle className="h-4 w-4 text-red-500" />
+                    <span>Low Stock</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="high">
+                  <div className="flex items-center gap-2">
+                    <ArrowUpCircle className="h-4 w-4 text-green-500" />
+                    <span>High Stock</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
 
-      {loading && <p className="text-center">Loading products...</p>}
+      {loading && <Loader />}
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {/* Table */}
@@ -301,7 +387,7 @@ export default function ProductTable() {
             ].map((title) => (
               <TableHead
                 key={title}
-                className="border px-4 py-2 text-gray-700 font-semibold text-sm md:text-lg"
+                className="border px-4 py-2 text-gray-700 font-semibold text-sm md:text-lg text-center align-middle"
               >
                 {title}
               </TableHead>
@@ -412,46 +498,62 @@ export default function ProductTable() {
       )}
       {/* Add Variant Dialog */}
       <Dialog open={isAddVariantOpen} onOpenChange={setIsAddVariantOpen}>
-        <DialogContent className="max-w-md rounded-2xl shadow-xl bg-white p-6">
+        <DialogContent className="max-w-md w-full rounded-3xl shadow-2xl bg-white p-8">
           <DialogHeader>
-            <DialogTitle>
-              Add Variant for {selectedProduct?.ItemName}
+            <DialogTitle className="text-2xl font-bold text-gray-800 mb-4">
+              Add Variant for{" "}
+              <span className="text-blue-600">{selectedProduct?.ItemName}</span>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4">
-            {["Gram", "Price", "Stock"].map((field) => (
-              <div key={field}>
-                <Label htmlFor={field}>{field}</Label>
-                <Input
-                  id={field}
-                  type="number"
-                  value={(newVariant as any)[field] || ""}
-                  onChange={(e) =>
-                    setNewVariant({
-                      ...newVariant,
-                      [field]: Number(e.target.value),
-                    })
-                  }
-                />
+          <div className="space-y-6 mt-2">
+            {[
+              { field: "Gram", icon: "⚖️" },
+              { field: "Price", icon: "💰" },
+              { field: "Stock", icon: "📦" },
+            ].map(({ field, icon }) => (
+              <div key={field} className="flex items-center gap-3">
+                <span className="text-xl">{icon}</span>
+                <div className="flex-1 flex flex-col">
+                  <Label
+                    htmlFor={field}
+                    className="mb-1 text-gray-700 font-medium"
+                  >
+                    {field}
+                  </Label>
+                  <Input
+                    id={field}
+                    type="number"
+                    value={(newVariant as any)[field] || ""}
+                    onChange={(e) =>
+                      setNewVariant({
+                        ...newVariant,
+                        [field]: Number(e.target.value),
+                      })
+                    }
+                    placeholder={`Enter ${field.toLowerCase()}`}
+                    className="shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
+                  />
+                </div>
               </div>
             ))}
           </div>
 
-          <DialogFooter className="flex justify-end gap-2 mt-6">
+          <div className="flex justify-end gap-3 mt-8">
             <Button
               variant="outline"
               onClick={() => setIsAddVariantOpen(false)}
+              className="hover:bg-gray-100 text-gray-700"
             >
               Cancel
             </Button>
             <Button
-              className="bg-green-600 text-white hover:bg-green-700"
+              className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2"
               onClick={handleAddVariant}
             >
               Save
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -506,36 +608,49 @@ function EditDialog({
   isString,
 }: EditDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-md rounded-2xl shadow-xl bg-white p-6">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <Label htmlFor="editInput">{title}</Label>
-          <Input
-            id="editInput"
-            type={isString ? "text" : "number"}
-            value={value ?? ""}
-            onChange={(e) =>
-              isString
-                ? setValue(e.target.value)
-                : setValue(Number(e.target.value))
-            }
-          />
-        </div>
-        <DialogFooter className="flex justify-end gap-2 mt-6">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={onSave}
-            className="bg-green-600 text-white hover:bg-green-700"
-          >
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+   <Dialog open={open} onOpenChange={setOpen}>
+  <DialogContent className="max-w-md w-full rounded-3xl shadow-2xl bg-white p-8">
+    <DialogHeader>
+      <DialogTitle className="text-xl font-bold text-gray-800 mb-4">
+        {title}
+      </DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-5">
+      <Label htmlFor="editInput" className="text-gray-700 font-medium">
+        {title}
+      </Label>
+      <Input
+        id="editInput"
+        type={isString ? "text" : "number"}
+        value={value ?? ""}
+        onChange={(e) =>
+          isString
+            ? setValue(e.target.value)
+            : setValue(Number(e.target.value))
+        }
+        placeholder={`Enter ${title.toLowerCase()}`}
+        className="shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
+      />
+    </div>
+
+    <div className="flex justify-end gap-3 mt-8">
+      <Button
+        variant="outline"
+        onClick={() => setOpen(false)}
+        className="hover:bg-gray-100 text-gray-700"
+      >
+        Cancel
+      </Button>
+      <Button
+        onClick={onSave}
+        className="bg-blue-600 text-white hover:bg-blue-700"
+      >
+        Save
+      </Button>
+    </div>
+  </DialogContent>
+</Dialog>
+
   );
 }

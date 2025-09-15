@@ -19,18 +19,6 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="flex justify-between items-center">
             <CardTitle>Dashboard Overview</CardTitle>
-
-            {/* Shadcn/ui Dropdown Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 px-2 py-1 border rounded hover:bg-gray-100">
-                Options <ChevronDown className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Refresh</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Export</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </CardHeader>
 
           {/* 2x2 Chart Grid */}

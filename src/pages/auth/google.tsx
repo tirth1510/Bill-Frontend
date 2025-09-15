@@ -3,10 +3,11 @@ import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/authcontext";
+import { toast } from "sonner"; // <-- import toast
 
 const GoogleLoginButton: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser } = useAuth();   // ✅ get setUser from context
+  const { setUser } = useAuth();
   const navigate = useNavigate();
 
   const handleSuccess = async (credentialResponse: CredentialResponse) => {
@@ -23,12 +24,13 @@ const GoogleLoginButton: React.FC = () => {
 
       console.log("Login success:", res.data);
 
-      // ✅ immediately update context so ProtectedRoute works
       setUser(res.data.user);
+      toast.success("Logged in successfully!"); // <-- show success toast
 
       navigate("/dashboard");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login failed:", err);
+      toast.error(err?.response?.data?.message || "Login failed!"); // <-- show error toast
     } finally {
       setLoading(false);
     }
@@ -66,7 +68,10 @@ const GoogleLoginButton: React.FC = () => {
       ) : (
         <GoogleLogin
           onSuccess={handleSuccess}
-          onError={() => console.log("Google Login Failed")}
+          onError={() => {
+            console.log("Google Login Failed");
+            toast.error("Google Login Failed"); // <-- toast on error
+          }}
           text="continue_with"
           shape="pill"
           size="large"

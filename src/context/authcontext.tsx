@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import axios from "axios";
 import type { User } from "@/types/auth";
+import { toast } from "sonner"; // <-- import toast
 
 interface AuthContextType {
   user: User | null;
@@ -35,8 +36,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         { withCredentials: true }
       );
       setUser(res.data.user);
-    } catch (err) {
+      toast.success("User fetched successfully!");
+    } catch (err: any) {
       setUser(null);
+      toast.error(err?.response?.data?.message || "Failed to fetch user");
     } finally {
       setLoading(false);
     }
@@ -50,8 +53,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         { withCredentials: true }
       );
       setUser(null);
-    } catch (err) {
+      toast.success("Logged out successfully!");
+    } catch (err: any) {
       console.error("Logout error:", err);
+      toast.error(err?.response?.data?.message || "Logout failed!");
     }
   };
 

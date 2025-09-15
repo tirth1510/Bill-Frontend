@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import Loader from "@/layouts/Loading"
 interface ItemReport {
   _id: string;
   itemName: string;
@@ -26,11 +26,13 @@ export default function ItemsReport() {
   const [period, setPeriod] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ loader state
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
+        setLoading(true); // ✅ start loader
         let url = `https://bill-backend-j5en.onrender.com/bill/stats/items-report?period=${period}`;
         if (period === "custom" && from && to) url += `&from=${from}&to=${to}`;
 
@@ -45,6 +47,8 @@ export default function ItemsReport() {
         setItems(itemsWithTotalGram);
       } catch (err) {
         console.error("Error fetching items report:", err);
+      } finally {
+        setLoading(false); // ✅ stop loader
       }
     };
 
@@ -64,13 +68,15 @@ export default function ItemsReport() {
           <head>
             <title>Items Report</title>
             <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
+              body { font-family: Arial, sans-serif; margin: 20px; color: #1f2937; }
               h2, h3, p { margin: 2px 0; text-align: center; }
               table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-              th, td { border: 1px solid #000; padding: 8px; }
-              th { background-color: #f0f0f0; text-align: left; }
+              th, td { border: 1px solid #d1d5db; padding: 10px; }
+              th { background-color: #f3f4f6; text-align: center; font-weight: 600; }
               td.text-center { text-align: center; }
               td.text-right { text-align: right; }
+              tr:nth-child(even) { background-color: #f9fafb; }
+              tr:hover { background-color: #e0f2fe; }
               .total { text-align: right; font-weight: bold; margin-top: 15px; }
               @media print {
                 body { -webkit-print-color-adjust: exact; }
@@ -92,9 +98,9 @@ export default function ItemsReport() {
   return (
     <DashboardLayout>
       <Card className="shadow-lg border mt-6">
-        <CardHeader className="flex flex-row items-center justify-between gap-4">
+        <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4">
           <CardTitle>Items Report</CardTitle>
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Select Period" />
@@ -116,20 +122,20 @@ export default function ItemsReport() {
                   type="date"
                   value={from}
                   onChange={(e) => setFrom(e.target.value)}
-                  className="border rounded p-1"
+                  className="border rounded px-2 py-1"
                 />
                 <input
                   type="date"
                   value={to}
                   onChange={(e) => setTo(e.target.value)}
-                  className="border rounded p-1"
+                  className="border rounded px-2 py-1"
                 />
               </div>
             )}
 
             <button
               onClick={handlePrint}
-              className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+              className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 transition"
             >
               Print / Download
             </button>
@@ -137,17 +143,19 @@ export default function ItemsReport() {
         </CardHeader>
 
         <CardContent ref={reportRef}>
-          {items.length === 0 ? (
-            <p className="text-gray-500">No sales data yet</p>
+          {loading ? (
+            <>
+            <Loader />
+            </>
+          ) : items.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">No sales data yet</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse mb-2">
+              <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr>
-                    <th colSpan={6} className="text-center p-2 border-black">
-                      <h2 className="text-xl font-bold">My Shop Name</h2>
-                      <p>Address Line 1, City, State</p>
-                      <p>Phone: +91 12345 67890 | Email: shop@example.com</p>
+                    <th colSpan={6} className="text-center p-3 border-b-2 border-gray-300">
+                      <h2 className="text-xl font-bold">I MATA</h2>
                     </th>
                   </tr>
                   <tr className="bg-gray-100 border-b">
@@ -161,7 +169,7 @@ export default function ItemsReport() {
                 </thead>
                 <tbody>
                   {items.map((item, idx) => (
-                    <tr key={idx} className="border-b hover:bg-gray-50">
+                    <tr key={idx} className="hover:bg-blue-50 even:bg-gray-50">
                       <td className="p-2">{item.itemName}</td>
                       <td className="p-2 text-center">{item.quantitySold}</td>
                       <td className="p-2 text-center">{item.gramPerUnit} g</td>
@@ -176,7 +184,7 @@ export default function ItemsReport() {
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr className="font-bold border-t">
+                  <tr className="font-bold border-t bg-gray-100">
                     <td className="p-2 text-left" colSpan={5}>
                       Total Amount
                     </td>

@@ -21,7 +21,6 @@ import {
 
 // Sidebar Data
 const data = {
- 
   navMain: [
     {
       title: "Dashboard",
@@ -36,31 +35,27 @@ const data = {
     {
       title: "Billing",
       url: "/bill",
-      icon: IconReceipt2, 
+      icon: IconReceipt2,
     },
     {
       title: "Invoice",
       url: "/invoice",
-      icon: IconFileInvoiceFilled, 
+      icon: IconFileInvoiceFilled,
     },
   ],
 };
 
-
-export function AppSidebar({
-  ...props
-}: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       {/* Sidebar Header */}
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <h1 className="text-lg font-bold tracking-wide text-blue-600 flex items-center gap-2">
-              <IconReceipt2 size={20} /> Billing System
-            </h1>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      {/* Sidebar Header */}
+      <SidebarHeader className="flex items-center justify-center py-0">
+        <img
+          src="/image.png"
+          alt="Shop Logo"
+          className="w-70 h-50 object-contain " 
+        />
       </SidebarHeader>
 
       {/* Sidebar Navigation */}
