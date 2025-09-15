@@ -1,12 +1,6 @@
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+
 import ChartLineDefault from "./linechart";
 import ChartPieLabel from "./oneDaysell";
 import ChartPieDonut from "./oneMonth";

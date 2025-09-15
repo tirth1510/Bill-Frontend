@@ -8,7 +8,7 @@ import {
   TableRow,
   TableCaption,
 } from "@/components/ui/table";
-import { FiChevronDown, FiSearch } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import {
   ArrowDownCircle,
@@ -25,7 +25,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -92,7 +91,7 @@ export default function ProductTable() {
   );
   const [itemSearch, setItemSearch] = useState(""); // live typed text
   const [appliedItemSearch, setAppliedItemSearch] = useState(""); // applied on search
-  const [typeSearch, setTypeSearch] = useState("");
+  const [typeSearch] = useState("");
 
   // Fetch products
   const fetchProducts = async () => {
