@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
