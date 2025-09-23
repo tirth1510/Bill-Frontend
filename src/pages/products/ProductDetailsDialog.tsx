@@ -175,11 +175,7 @@ export default function ProductDetailsDialog({
         <div className="flex flex-col justify-between h-full space-y-6 bg-white border-r-4 rounded-xl p-4">
           <div className="flex flex-col items-center space-y-4">
             <div className="flex justify-center w-full">
-              <img
-                src={product.image || "/shop.png"}
-                alt={product.ItemName}
-                className="rounded-lg border max-h-64 object-contain"
-              />
+            
             </div>
 
             <div className="p-6 bg-white shadow-md w-full max-w-md">
