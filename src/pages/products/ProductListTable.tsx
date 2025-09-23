@@ -65,35 +65,80 @@ export default function ProductTable() {
     null
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const [isEditPriceOpen, setIsEditPriceOpen] = useState(false);
   const [editPrice, setEditPrice] = useState<number | null>(null);
-
   const [isEditStockOpen, setIsEditStockOpen] = useState(false);
   const [editStock, setEditStock] = useState<number | null>(null);
-
   const [isEditItemNameOpen, setIsEditItemNameOpen] = useState(false);
   const [editItemName, setEditItemName] = useState<string | null>(null);
-
   const [editProduct, setEditProduct] = useState<ProductVariant | null>(null);
-
-  // Add Variant dialog state
   const [isAddVariantOpen, setIsAddVariantOpen] = useState(false);
   const [newVariant, setNewVariant] = useState({
     Gram: 0,
     Price: 0,
     Stock: 0,
   });
-
-  // Filters & search
   const [stockFilter, setStockFilter] = useState<"low" | "high" | "none">(
     "none"
   );
-  const [itemSearch, setItemSearch] = useState(""); // live typed text
-  const [appliedItemSearch, setAppliedItemSearch] = useState(""); // applied on search
+  const [itemSearch, setItemSearch] = useState("");
+  const [isEditGramOpen, setIsEditGramOpen] = useState(false);
+  const [editGram, setEditGram] = useState<number | null>(null);
+  const [appliedItemSearch, setAppliedItemSearch] = useState("");
   const [typeSearch] = useState("");
 
-  // Fetch products
+  const openEditGram = (product: ProductVariant) => {
+    setEditProduct(product);
+    setEditGram(product.Gram);
+    setIsEditGramOpen(true);
+  };
+
+  const handleSaveGram = async () => {
+    if (!editProduct || editGram === null) return;
+
+    try {
+      await axios.put(
+        `https://bill-backend-j5en.onrender.com/products/update-variant-gram/${editProduct.id}/${editProduct._id}`,
+        { gram: editGram },
+        { withCredentials: true }
+      );
+
+      setProducts((prev) =>
+        prev.map((p) =>
+          p._id === editProduct._id ? { ...p, Gram: editGram } : p
+        )
+      );
+
+      setIsEditGramOpen(false);
+      setEditProduct(null);
+      setEditGram(null);
+
+      toast.success(
+        `Gram for ${editProduct.ItemName} has been updated to ${editGram} g`
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong while updating the gram.");
+    }
+  };
+  const handleDeleteVariant = async (product: ProductVariant) => {
+    if (!confirm(`Are you sure you want to delete this variant?`)) return;
+
+    try {
+      await axios.delete(
+        `https://bill-backend-j5en.onrender.com/products/delete-variant/${product.id}/${product._id}`,
+        { withCredentials: true }
+      );
+
+      setProducts((prev) => prev.filter((p) => p._id !== product._id));
+
+      toast.success(`Variant for ${product.ItemName} deleted successfully`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete variant.");
+    }
+  };
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -116,38 +161,31 @@ export default function ProductTable() {
     fetchProducts();
   }, []);
 
-/// Filter & search
-useEffect(() => {
-  let temp = [...products];
+  useEffect(() => {
+    let temp = [...products];
 
-  // Stock filter
-  if (stockFilter === "low") temp.sort((a, b) => a.Stock - b.Stock);
-  if (stockFilter === "high") temp.sort((a, b) => b.Stock - a.Stock);
+    if (stockFilter === "low") temp.sort((a, b) => a.Stock - b.Stock);
+    if (stockFilter === "high") temp.sort((a, b) => b.Stock - a.Stock);
 
-  // Exact match applied only after Enter / click
-  if (appliedItemSearch.trim() !== "") {
-    temp = temp.filter(
-      (p) => p.ItemName.toLowerCase() === appliedItemSearch.toLowerCase()
-    );
-  } else if (itemSearch.trim() !== "") {
-    // Live filtering (partial match while typing)
-    temp = temp.filter((p) =>
-      p.ItemName.toLowerCase().includes(itemSearch.toLowerCase())
-    );
-  }
+    if (appliedItemSearch.trim() !== "") {
+      temp = temp.filter(
+        (p) => p.ItemName.toLowerCase() === appliedItemSearch.toLowerCase()
+      );
+    } else if (itemSearch.trim() !== "") {
+      temp = temp.filter((p) =>
+        p.ItemName.toLowerCase().includes(itemSearch.toLowerCase())
+      );
+    }
 
-  // Type filter
-  if (typeSearch.trim() !== "") {
-    temp = temp.filter(
-      (p) => p.Type?.toLowerCase() === typeSearch.toLowerCase()
-    );
-  }
+    if (typeSearch.trim() !== "") {
+      temp = temp.filter(
+        (p) => p.Type?.toLowerCase() === typeSearch.toLowerCase()
+      );
+    }
 
-  setFilteredProducts(temp);
-}, [products, stockFilter, itemSearch, appliedItemSearch, typeSearch]);
+    setFilteredProducts(temp);
+  }, [products, stockFilter, itemSearch, appliedItemSearch, typeSearch]);
 
-
-  // Dialog handlers
   const openDialog = (product: ProductVariant) => {
     setSelectedProduct(product);
     setIsDialogOpen(true);
@@ -209,7 +247,7 @@ useEffect(() => {
     try {
       await axios.put(
         `https://bill-backend-j5en.onrender.com/products/update-variant-stock/${editProduct.id}/${editProduct._id}`,
-        { Stock: editStock },
+        { stock: editStock },
         { withCredentials: true }
       );
       setProducts((prev) =>
@@ -233,20 +271,24 @@ useEffect(() => {
     if (!editProduct || editItemName === null) return;
     try {
       await axios.put(
-        `https://bill-backend-j5en.onrender.com/products/update-variant-itemname/${editProduct.id}/${editProduct._id}`,
+        `https://bill-backend-j5en.onrender.com/products/update-variant-itemname/${editProduct.id}`,
         { ItemName: editItemName },
         { withCredentials: true }
       );
+
+      // ✅ update only ItemName (product-level, not variant)
       setProducts((prev) =>
         prev.map((p) =>
           p._id === editProduct._id ? { ...p, ItemName: editItemName } : p
         )
       );
+
       setIsEditItemNameOpen(false);
       setEditProduct(null);
       setEditItemName(null);
     } catch (err) {
       console.error(err);
+      toast.error("Something went wrong while updating ItemName.");
     }
   };
 
@@ -419,8 +461,15 @@ useEffect(() => {
                   </div>
                 </TableCell>
                 <TableCell className="border px-4 py-3 text-center">
-                  {p.Gram} g
+                  <div className="flex items-center justify-center gap-2">
+                    {p.Gram} Gram
+                    <Pencil
+                      className="w-5 h-5 text-blue-600 cursor-pointer hover:text-blue-800"
+                      onClick={() => openEditGram(p)}
+                    />
+                  </div>
                 </TableCell>
+
                 <TableCell className="border px-4 py-3 text-center text-green-600 font-semibold">
                   <div className="flex items-center justify-center gap-2">
                     ₹ {p.Price}/-
@@ -454,7 +503,6 @@ useEffect(() => {
                   {p.BarCodenumber}
                 </TableCell>
 
-                {/* Action cell with Add Variant */}
                 <TableCell className="border px-4 py-3 text-center">
                   <div className="flex flex-col md:flex-row justify-center gap-2">
                     <Button
@@ -469,6 +517,7 @@ useEffect(() => {
                       variant="ghost"
                       size="icon"
                       className="hover:bg-red-50 p-1 rounded"
+                      onClick={() => handleDeleteVariant(p)}
                     >
                       <Trash2 className="w-5 h-5 text-red-600" />
                     </Button>
@@ -556,7 +605,15 @@ useEffect(() => {
         </DialogContent>
       </Dialog>
 
-      {/* Reusable Edit Dialogs */}
+      <EditDialog
+        title="Edit Gram"
+        value={editGram}
+        setValue={setEditGram}
+        open={isEditGramOpen}
+        setOpen={setIsEditGramOpen}
+        onSave={handleSaveGram}
+      />
+
       <EditDialog
         title="Edit Price"
         value={editPrice}
@@ -607,49 +664,48 @@ function EditDialog({
   isString,
 }: EditDialogProps) {
   return (
-   <Dialog open={open} onOpenChange={setOpen}>
-  <DialogContent className="max-w-md w-full rounded-3xl shadow-2xl bg-white p-8">
-    <DialogHeader>
-      <DialogTitle className="text-xl font-bold text-gray-800 mb-4">
-        {title}
-      </DialogTitle>
-    </DialogHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="max-w-md w-full rounded-3xl shadow-2xl bg-white p-8">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-gray-800 mb-4">
+            {title}
+          </DialogTitle>
+        </DialogHeader>
 
-    <div className="space-y-5">
-      <Label htmlFor="editInput" className="text-gray-700 font-medium">
-        {title}
-      </Label>
-      <Input
-        id="editInput"
-        type={isString ? "text" : "number"}
-        value={value ?? ""}
-        onChange={(e) =>
-          isString
-            ? setValue(e.target.value)
-            : setValue(Number(e.target.value))
-        }
-        placeholder={`Enter ${title.toLowerCase()}`}
-        className="shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
-      />
-    </div>
+        <div className="space-y-5">
+          <Label htmlFor="editInput" className="text-gray-700 font-medium">
+            {title}
+          </Label>
+          <Input
+            id="editInput"
+            type={isString ? "text" : "number"}
+            value={value ?? ""}
+            onChange={(e) =>
+              isString
+                ? setValue(e.target.value)
+                : setValue(Number(e.target.value))
+            }
+            placeholder={`Enter ${title.toLowerCase()}`}
+            className="shadow-sm focus:ring-2 focus:ring-blue-300 focus:border-blue-400"
+          />
+        </div>
 
-    <div className="flex justify-end gap-3 mt-8">
-      <Button
-        variant="outline"
-        onClick={() => setOpen(false)}
-        className="hover:bg-gray-100 text-gray-700"
-      >
-        Cancel
-      </Button>
-      <Button
-        onClick={onSave}
-        className="bg-blue-600 text-white hover:bg-blue-700"
-      >
-        Save
-      </Button>
-    </div>
-  </DialogContent>
-</Dialog>
-
+        <div className="flex justify-end gap-3 mt-8">
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            className="hover:bg-gray-100 text-gray-700"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={onSave}
+            className="bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Save
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

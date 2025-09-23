@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Loader from "@/layouts/Loading"
+import Loader from "@/layouts/Loading";
 interface ItemReport {
   _id: string;
   itemName: string;
@@ -99,7 +99,12 @@ export default function ItemsReport() {
     <DashboardLayout>
       <Card className="shadow-lg border mt-6">
         <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <CardTitle>Items Report</CardTitle>
+          {/* Left side: Logo */}
+          <div className="flex items-center gap-2">
+            <img src="/image.png" alt="Logo" className="h-35 w-auto" />
+          </div>
+
+          {/* Right side: Filters + Print */}
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[140px]">
@@ -142,11 +147,10 @@ export default function ItemsReport() {
           </div>
         </CardHeader>
 
+        {/* Bottom: Table */}
         <CardContent ref={reportRef}>
           {loading ? (
-            <>
             <Loader />
-            </>
           ) : items.length === 0 ? (
             <p className="text-gray-500 text-center py-4">No sales data yet</p>
           ) : (
@@ -154,7 +158,10 @@ export default function ItemsReport() {
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr>
-                    <th colSpan={6} className="text-center p-3 border-b-2 border-gray-300">
+                    <th
+                      colSpan={6}
+                      className="text-center p-3 border-b-2 border-gray-300"
+                    >
                       <h2 className="text-xl font-bold">I MATA</h2>
                     </th>
                   </tr>

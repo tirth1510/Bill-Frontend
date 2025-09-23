@@ -15,6 +15,7 @@ import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Loader from "@/layouts/Loading";
+import Barcode from "react-barcode"; // ✅ correct barcode package
 
 type Product = {
   _id: string;
@@ -23,10 +24,16 @@ type Product = {
   Price: number;
   Stock: number;
   BarCode?: string;
+  BarCodenumber: string;
 };
 
 type ProductListProps = {
-  onAddItem: (item: { name: string; gram: number; price: number }) => void;
+  onAddItem: (item: {
+    name: string;
+    gram?: number;
+    price: number;
+    barcode?: string;
+  }) => void;
 };
 
 export default function ProductList({ onAddItem }: ProductListProps) {
@@ -56,12 +63,17 @@ export default function ProductList({ onAddItem }: ProductListProps) {
   }, []);
 
   const handleAddItem = (p: Product) => {
-    onAddItem({ name: p.ItemName, gram: p.Gram, price: p.Price });
+    onAddItem({
+      name: p.ItemName,
+      gram: p.Gram,
+      price: p.Price,
+      barcode: p.BarCode ?? "",
+    });
   };
 
   const handleSearch = () => {
     if (!searchTerm.trim()) {
-      setFilteredProducts(products); // show all if empty
+      setFilteredProducts(products);
       return;
     }
     setFilteredProducts(
@@ -78,8 +90,8 @@ export default function ProductList({ onAddItem }: ProductListProps) {
 
   return (
     <div>
-      {/* Search Bar Right Side */}
-      <div className="flex justify-end mb-4 ">
+      {/* Search Bar */}
+      <div className="flex justify-end mb-4">
         <div className="relative w-full md:w-64">
           <input
             type="text"
@@ -89,7 +101,6 @@ export default function ProductList({ onAddItem }: ProductListProps) {
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="w-full border rounded-lg pl-10 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
           />
-          {/* Icons */}
           <div className="absolute inset-y-0 left-3 flex items-center cursor-pointer">
             {searchTerm ? (
               <X
@@ -130,6 +141,12 @@ export default function ProductList({ onAddItem }: ProductListProps) {
                     Stock
                   </TableHead>
                   <TableHead className="border px-4 py-2 text-center">
+                    BarcodeNumber
+                  </TableHead>
+                  <TableHead className="border px-4 py-2 text-center">
+                    Barcode
+                  </TableHead>
+                  <TableHead className="border px-4 py-2 text-center">
                     Action
                   </TableHead>
                 </TableRow>
@@ -139,7 +156,7 @@ export default function ProductList({ onAddItem }: ProductListProps) {
                 {filteredProducts.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={6}
                       className="py-6 text-gray-500 text-center"
                     >
                       No products found.
@@ -151,7 +168,7 @@ export default function ProductList({ onAddItem }: ProductListProps) {
                       key={p._id}
                       className="hover:bg-blue-50 transition-colors"
                     >
-                      <TableCell className="border px-4 py-2">
+                      <TableCell className="border px-4 py-2  text-xl font-semibold">
                         {p.ItemName}
                       </TableCell>
                       <TableCell className="border px-4 py-2">
@@ -163,6 +180,25 @@ export default function ProductList({ onAddItem }: ProductListProps) {
                       <TableCell className="border px-4 py-2">
                         {p.Stock}
                       </TableCell>
+                      <TableCell className="border px-4 py-2">
+                        {p.BarCodenumber}
+                      </TableCell>
+                      <TableCell className="border px-4 py-2">
+                        <div className="flex justify-center items-center">
+                          {p.BarCode ? (
+                            <Barcode
+                              value={p.BarCode}
+                              format="CODE128"
+                              width={1.5}
+                              height={40}
+                              displayValue={true}
+                            />
+                          ) : (
+                            <span className="text-gray-400">N/A</span>
+                          )}
+                        </div>
+                      </TableCell>
+
                       <TableCell className="border px-4 py-2">
                         <Button
                           className="bg-blue-100 hover:bg-blue-200"

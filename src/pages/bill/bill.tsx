@@ -5,7 +5,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ScannerTab from "@/lib/scannerTab";
-import { Camera, CameraOff, Package } from "lucide-react";
+import { Camera, CameraOff, MinusCircle, Package } from "lucide-react";
 import Searchitem from "./serchitem";
 
 import {
@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import jsPDF from "jspdf";
-
+import { FaWhatsapp } from "react-icons/fa";
+import { SiGmail } from "react-icons/si";
 interface CartItem {
   name: string;
   price: number;
@@ -33,9 +34,8 @@ export default function BillPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [whNumber, setWhNumber] = useState("");
-  const [generatedBill, setGeneratedBill] = useState<any>(null); // store bill data for PDF download
+  const [generatedBill, setGeneratedBill] = useState<any>(null); 
 
-  // Add item to cart
   const handleAddItem = (item: {
     name: string;
     gram?: number;
@@ -47,7 +47,8 @@ export default function BillPage() {
       (i) =>
         i.name === item.name &&
         (i.gram ?? 0) === (item.gram ?? 0) &&
-        i.barcode === barcode
+        i.barcode === barcode &&
+        i.price === item.price
     );
 
     if (index > -1) {
@@ -59,7 +60,6 @@ export default function BillPage() {
     }
   };
 
-  // Fetch product
   const fetchProduct = async (
     code: string,
     type: "barcode" | "barCodenumber"
@@ -253,6 +253,15 @@ export default function BillPage() {
   };
 
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const handleDecreaseItem = (index: number) => {
+    const newCart = [...cart];
+    if (newCart[index].quantity > 1) {
+      newCart[index].quantity -= 1;
+    } else {
+      newCart.splice(index, 1); // remove item if quantity = 1
+    }
+    setCart(newCart);
+  };
 
   return (
     <DashboardLayout>
@@ -293,10 +302,12 @@ export default function BillPage() {
                   onChange={(e) => setBarcode(e.target.value)}
                   className="border w-full p-2 rounded-md"
                 />
-                <Button 
-                className="bg-blue-500 hover:bg-blue-700 font-semibold p-4"
-                onClick={handleAddByCode}>
-                  + Add</Button>
+                <Button
+                  className="bg-blue-500 hover:bg-blue-700 font-semibold p-4"
+                  onClick={handleAddByCode}
+                >
+                  + Add
+                </Button>
               </div>
 
               <div>
@@ -323,49 +334,51 @@ export default function BillPage() {
                 >
                   Generate Bill
                 </Button>
+                {/* Clear Bill Button */}
+                <div className="flex justify-end mt-4 ">
+                  <Button
+                    variant="destructive"
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold"
+                    onClick={() => setCart([])}
+                  >
+                    Clear Bill
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Right Card: Bill Display */}
           <Card className="flex-1 shadow-lg border p-4">
-            <CardHeader>
-              <CardTitle className="text-center text-xl font-bold">
-                MALL NAME
-              </CardTitle>
-              <p className="text-center text-sm text-gray-600">
-                Address Line 1, Address Line 2
-              </p>
-              <p className="text-center text-sm text-gray-600">
+            <CardHeader className="text-center">
+              {/* Logo */}
+              <img
+                src="./image.png"
+                alt="I Mata"
+                className="mx-auto h-40 w-auto"
+              />
+
+              {/* Shop Details */}
+              <h2 className="text-xl font-bold mt-1">I Mata Mall</h2>
+              <p className="text-sm text-gray-600">
                 Phone: 123-456-7890 | Email: info@mallname.com
               </p>
               <div className="border-b border-dashed my-2"></div>
             </CardHeader>
+
             <CardContent>
               {cart.length === 0 ? (
-                <p className="text-gray-500">Cart is empty</p>
+                <p className="text-gray-500 text-center">Cart is empty</p>
               ) : (
                 <div className="space-y-4">
-                  <div className="text-sm">
-                    <p>
-                      <strong>Date:</strong> {new Date().toLocaleDateString()}
-                    </p>
-                    <p>
-                      <strong>Customer Name:</strong> John Doe
-                    </p>
-                    <p>
-                      <strong>Customer ID:</strong> CUST001
-                    </p>
-                  </div>
-
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-gray-100 border-b">
+                      <tr className="bg-gray-200 border-b">
                         <th className="p-2 text-left">Item</th>
                         <th className="p-2 text-center">Qty</th>
                         <th className="p-2 text-center">Gram</th>
                         <th className="p-2 text-right">Price</th>
                         <th className="p-2 text-right">Total</th>
+                        <th className="p-2 text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -374,11 +387,20 @@ export default function BillPage() {
                           <td className="p-2">{item.name}</td>
                           <td className="p-2 text-center">{item.quantity}</td>
                           <td className="p-2 text-center">
-                            {item.gram || "—"}
+                            {item.gram ?? "-"}
                           </td>
                           <td className="p-2 text-right">₹{item.price}</td>
                           <td className="p-2 text-right">
                             ₹{item.price * item.quantity}
+                          </td>
+                          <td className="p-2 text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDecreaseItem(idx)}
+                            >
+                              <MinusCircle className="w-5 h-5 text-red-500" />
+                            </Button>
                           </td>
                         </tr>
                       ))}
@@ -386,9 +408,9 @@ export default function BillPage() {
                   </table>
 
                   <div className="text-right font-semibold space-y-1">
-                    <p>Subtotal: ₹{total}</p>
+                    <p>Subtotal: ₹ {total} /-</p>
                     <p className="text-lg border-t border-gray-400 pt-2">
-                      Total Amount: ₹{total}
+                      Total Amount: ₹ {total} /-
                     </p>
                   </div>
 
@@ -407,7 +429,6 @@ export default function BillPage() {
           <Searchitem onAddItem={handleAddItem} />
         </div>
 
-        {/* Dialog for Email / WhatsApp / Download */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
@@ -416,8 +437,18 @@ export default function BillPage() {
 
             <Tabs defaultValue="email" className="space-y-4">
               <TabsList>
-                <TabsTrigger value="email">Email</TabsTrigger>
-                <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
+                <TabsTrigger value="email" className="flex items-center gap-2">
+                  <SiGmail className="w-5 h-5 text-red-500" />
+                  Email
+                </TabsTrigger>
+
+                <TabsTrigger
+                  value="whatsapp"
+                  className="flex items-center gap-2"
+                >
+                  <FaWhatsapp className="w-5 h-5 text-green-500" />
+                  WhatsApp
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="email">
@@ -428,7 +459,10 @@ export default function BillPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-                <Button className="mt-2 w-full" onClick={handleSendEmail}>
+                <Button
+                  className="mt-2 w-full bg-blue-500 hover:bg-blue-700 text-white font-semibold"
+                  onClick={handleSendEmail}
+                >
                   Send Email
                 </Button>
               </TabsContent>
