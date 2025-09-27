@@ -6,24 +6,22 @@ import BillPage from "./pages/bill/BillPage";
 import Login from "./pages/auth/login";
 import Pin from "./pages/pin/createpin";
 import ProtectedRoute from "./middleware/ProtectedRoute";
-import Loader  from "@/layouts/Loading";
+import Loader from "@/layouts/Loading";
 import { useState, useEffect } from "react";
+import WhatsAppBill from "./pages/bill/whatsapp-bill";
 
 function App() {
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate app initialization or API call
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500); // 1.5s loading screen
-
     return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
-    return <Loader />; 
+    return <Loader />;
   }
 
   return (
@@ -47,18 +45,31 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/bill" element={
-           <ProtectedRoute>
-
-             <Bill />
-           </ProtectedRoute>
-          } />
-        <Route path="/invoice" element={
-          <ProtectedRoute>
-
-            <BillPage />
-          </ProtectedRoute>
-          } />
+        <Route
+          path="/bill"
+          element={
+            <ProtectedRoute>
+              <Bill />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/invoice"
+          element={
+            <ProtectedRoute>
+              <BillPage />
+            </ProtectedRoute>
+          }
+        />
+        {/* WhatsApp Bill page must be inside <Routes> */}
+        <Route
+          path="/whatsapp-bill"
+          element={
+            <ProtectedRoute>
+              <WhatsAppBill />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
