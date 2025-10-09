@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ReactQueryProvider: React.FC<Props> = ({ children }) => {
-  const clientId = "248488594338-dj46dqfrollrm3m06sfr4ee0fdf1b87d.apps.googleusercontent.com"
+  const clientId = "42299733053-0vvhi1j4qk1ma0jc8cqg0p9l0k0mi8os.apps.googleusercontent.com"
 
   
 

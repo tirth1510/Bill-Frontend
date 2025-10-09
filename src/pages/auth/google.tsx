@@ -17,7 +17,7 @@ const GoogleLoginButton: React.FC = () => {
       setLoading(true);
 
       const res = await axios.post(
-        `https://bill-backend-j5en.onrender.com/auth/google-login`,
+        `http://localhost:5000/auth/google-login`,
         { credential: credentialResponse.credential },
         { withCredentials: true }
       );

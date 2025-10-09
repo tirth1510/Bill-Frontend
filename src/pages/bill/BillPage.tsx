@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Loader from "@/layouts/Loading";
+
 interface ItemReport {
   _id: string;
   itemName: string;
@@ -26,13 +27,13 @@ export default function ItemsReport() {
   const [period, setPeriod] = useState("all");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ loader state
+  const [loading, setLoading] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        setLoading(true); // ✅ start loader
+        setLoading(true);
         let url = `https://bill-backend-j5en.onrender.com/bill/stats/items-report?period=${period}`;
         if (period === "custom" && from && to) url += `&from=${from}&to=${to}`;
 
@@ -48,7 +49,7 @@ export default function ItemsReport() {
       } catch (err) {
         console.error("Error fetching items report:", err);
       } finally {
-        setLoading(false); // ✅ stop loader
+        setLoading(false);
       }
     };
 
@@ -68,20 +69,40 @@ export default function ItemsReport() {
           <head>
             <title>Items Report</title>
             <style>
-              body { font-family: Arial, sans-serif; margin: 20px; color: #1f2937; }
-              h2, h3, p { margin: 2px 0; text-align: center; }
-              table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-              th, td { border: 1px solid #d1d5db; padding: 10px; }
-              th { background-color: #f3f4f6; text-align: center; font-weight: 600; }
+              body {
+                font-family: Arial, sans-serif;
+                margin: 30px;
+                color: #000;
+                background: #fff;
+              }
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #fff;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                font-size: 13px;
+              }
+              th {
+                text-align: center;
+                font-weight: bold;
+                background: #fff;
+              }
               td.text-center { text-align: center; }
               td.text-right { text-align: right; }
-              tr:nth-child(even) { background-color: #f9fafb; }
-              tr:hover { background-color: #e0f2fe; }
-              .total { text-align: right; font-weight: bold; margin-top: 15px; }
+              tfoot td { font-weight: bold; }
+
+              img {
+                display: block;
+                margin: 0 auto;
+              }
+
               @media print {
-                body { -webkit-print-color-adjust: exact; }
-                table { page-break-inside: auto; }
-                tr { page-break-inside: avoid; page-break-after: auto; }
+                body {
+                  -webkit-print-color-adjust: exact;
+                }
               }
             </style>
           </head>
@@ -99,12 +120,7 @@ export default function ItemsReport() {
     <DashboardLayout>
       <Card className="shadow-lg border mt-6">
         <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Left side: Logo */}
-          <div className="flex items-center gap-2">
-            <img src="/image.png" alt="Logo" className="h-35 w-auto" />
-          </div>
-
-          {/* Right side: Filters + Print */}
+          {/* Filters + Print */}
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[140px]">
@@ -147,7 +163,7 @@ export default function ItemsReport() {
           </div>
         </CardHeader>
 
-        {/* Bottom: Table */}
+        {/* Table */}
         <CardContent ref={reportRef}>
           {loading ? (
             <Loader />
@@ -155,47 +171,90 @@ export default function ItemsReport() {
             <p className="text-gray-500 text-center py-4">No sales data yet</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
+              <table className="w-full text-sm border border-black border-collapse bg-white">
                 <thead>
-                  <tr>
-                    <th
-                      colSpan={6}
-                      className="text-center p-3 border-b-2 border-gray-300"
-                    >
-                      <h2 className="text-xl font-bold">I MATA</h2>
-                    </th>
-                  </tr>
-                  <tr className="bg-gray-100 border-b">
-                    <th className="p-2 text-left">Item Name</th>
-                    <th className="p-2 text-center">Quantity Sold</th>
-                    <th className="p-2 text-center">Gram per Item</th>
-                    <th className="p-2 text-center">Total Gram Sold</th>
-                    <th className="p-2 text-center">Price per Item (₹)</th>
-                    <th className="p-2 text-right">Total Revenue (₹)</th>
-                  </tr>
-                </thead>
+  {/* Header Row */}
+  <tr>
+    <th colSpan={6} className="border border-black p-2">
+      <div className="flex items-center justify-between">
+        {/* Left: Logo (smaller & fixed size) */}
+        <img
+          src="/image.png"
+          alt="Shop Logo"
+          className="h-12 w-12 object-contain"
+        />
+
+        {/* Center: Title */}
+        <div className="flex-1 text-center">
+          <h2 className="text-base font-bold">I MATA</h2>
+        </div>
+
+        {/* Right: Phone */}
+        <div className="text-right">
+          <p className="text-xs font-medium">Phone: +91-9876543210</p>
+        </div>
+      </div>
+    </th>
+  </tr>
+
+  {/* Column Headers */}
+  <tr>
+    <th className="border border-black p-2 text-left w-[30%]">Item Name</th>
+    <th className="border border-black p-2 text-center w-[10%]">Quantity</th>
+    <th className="border border-black p-2 text-center text-xs w-[15%]">Gram / Item</th>
+    <th className="border border-black p-2 text-center text-xs w-[15%]">Total Gram</th>
+    <th className="border border-black p-2 text-center text-xs w-[15%]">Price (₹)</th>
+    <th className="border border-black p-2 text-right text-xs w-[15%]">Revenue (₹)</th>
+  </tr>
+</thead>
+
+
                 <tbody>
                   {items.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-blue-50 even:bg-gray-50">
-                      <td className="p-2">{item.itemName}</td>
-                      <td className="p-2 text-center">{item.quantitySold}</td>
-                      <td className="p-2 text-center">{item.gramPerUnit} g</td>
-                      <td className="p-2 text-center">{item.totalGram} g</td>
-                      <td className="p-2 text-center">
+                    <tr key={idx}>
+                      <td className="border border-black p-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-black p-2 text-center">
+                        {item.quantitySold}
+                      </td>
+                      <td className="border border-black p-2 text-center text-xs">
+                        {item.gramPerUnit} g
+                      </td>
+                      <td className="border border-black p-2 text-center text-xs">
+                        {item.totalGram} g
+                      </td>
+                      <td className="border border-black p-2 text-center text-xs">
                         ₹{item.price.toLocaleString("en-IN")}
                       </td>
-                      <td className="p-2 text-right">
+                      <td className="border border-black p-2 text-right text-xs">
                         ₹{item.totalRevenue.toLocaleString("en-IN")}
                       </td>
                     </tr>
                   ))}
                 </tbody>
+
+                {/* Footer */}
                 <tfoot>
-                  <tr className="font-bold border-t bg-gray-100">
-                    <td className="p-2 text-left" colSpan={5}>
-                      Total Amount
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="border border-black p-2 text-right font-semibold"
+                    >
+                      Subtotal
                     </td>
-                    <td className="p-2 text-right">
+                    <td className="border border-black p-2 text-right font-semibold">
+                      ₹{totalAmount.toLocaleString("en-IN")}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="border border-black p-2 text-right font-bold"
+                    >
+                      Total
+                    </td>
+                    <td className="border border-black p-2 text-right font-bold">
                       ₹{totalAmount.toLocaleString("en-IN")}
                     </td>
                   </tr>
