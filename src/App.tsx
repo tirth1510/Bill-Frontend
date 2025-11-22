@@ -5,7 +5,6 @@ import Bill from "./pages/bill/bill";
 import BillPage from "./pages/bill/BillPage";
 import Login from "./pages/auth/login";
 import Pin from "./pages/pin/createpin";
-import ProtectedRoute from "./middleware/ProtectedRoute";
 import Loader from "@/layouts/Loading";
 import { useState, useEffect } from "react";
 import WhatsAppBill from "./pages/bill/whatsapp-bill";
@@ -29,47 +28,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/pin" element={<Pin />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/products"
-          element={
-            <ProtectedRoute>
-              <ProductsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/bill"
-          element={
-            <ProtectedRoute>
-              <Bill />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/invoice"
-          element={
-            <ProtectedRoute>
-              <BillPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/bill" element={<Bill />} />
+        <Route path="/invoice" element={<BillPage />} />
         {/* WhatsApp Bill page must be inside <Routes> */}
-        <Route
-          path="/whatsapp-bill"
-          element={
-            <ProtectedRoute>
-              <WhatsAppBill />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/whatsapp-bill" element={<WhatsAppBill />} />
       </Routes>
     </Router>
   );
